@@ -1,16 +1,23 @@
 import os
 from pathlib import Path
+from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = 'django-insecure-j_89af+30&&4qm*8z9_(^zz8p4-ho8z_m6ylm0s$h!-p@on1_^'
+def split_env_csv(name, default=''):
+    value = os.getenv(name, default)
+    return [item.strip() for item in value.split(',') if item.strip()]
 
-DEBUG = False
 
-ALLOWED_HOSTS = [
-    'mykfrbbb.ddns.net',
-]
+SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
+
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = split_env_csv(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1,mykfrbbb.ddns.net'
+)
 
 
 # Application definition
@@ -125,6 +132,7 @@ STATIC_ROOT = BASE_DIR / 'collected_static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
-]
+CORS_ORIGIN_WHITELIST = split_env_csv(
+    'CORS_ORIGIN_WHITELIST',
+    'http://localhost:3000,http://127.0.0.1:3000'
+)
